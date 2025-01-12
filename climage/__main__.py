@@ -119,7 +119,7 @@ def convert(
     """
     # open the img, but convert to rgb because this fails if grayscale
     # (assumes pixels are at least triplets)
-    im = Image.open(filename).convert("RGB")
+    im = Image.open(filename)
     return convert_pil(
         im,
         is_truecolor=is_truecolor,
@@ -162,7 +162,6 @@ def convert_array(
         is_16color=is_16color,
         is_8color=is_8color,
     )
-
     assert (not is_unicode) or len(
         arr
     ) % 2 == 0, "Expecting even number of rows in array for unicode conversion"

@@ -352,6 +352,8 @@ def get_dual_unicode_ansi_pixels(
         ctype   -- the color depth to use, default color_types.color256
         palette -- if not using the truecolor depth, adjust how pixels map to the desired colourspace to match the colourscheme better.
     """
+    no_top = top_pixel[3] == 0
+    no_bottom = bottom_pixel[3] == 0
     color_top = convert_pixel_color(
         top_pixel,
         ctype=ctype,
@@ -364,7 +366,15 @@ def get_dual_unicode_ansi_pixels(
     )
 
     if ctype == color_types.truecolor:
-        return "\x1b[48;2;{};{};{}m\x1b[38;2;{};{};{}m▄".format(
+        top_string = "\x1b[49m" if no_top else "\x1b[48;2;{};{};{}m"
+        bottom_string = "\x1b[38;5;0m" if no_bottom else "\x1b[38;2;{};{};{}m"
+        if (no_top and no_bottom):
+            bottom_string = bottom_string + " "
+        else:
+            bottom_string = bottom_string + "▄"
+        full_string = top_string + bottom_string
+
+        return full_string.format(
             *color_top, *color_bottom
         )
     if ctype == color_types.color256:
@@ -396,7 +406,6 @@ def _toAnsi(img, oWidth, is_unicode, color_type, palette):
     img = img.resize((destWidth, destHeight))
     # where the converted string will be put in
     ansi_build = StringIO()
-
     yit = iter(range(destHeight))
     for y in yit:
         for x in range(destWidth):
